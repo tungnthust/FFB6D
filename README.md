@@ -1,5 +1,33 @@
 # FFB6D
+
 This is the official source code for the **CVPR2021 Oral** work, **FFB6D: A Full Flow Biderectional Fusion Network for 6D Pose Estimation**. ([Arxiv](https://arxiv.org/abs/2103.02242), [Video_Bilibili](https://www.bilibili.com/video/BV1YU4y1a7Kp?from=search&seid=8306279574921937158), [Video_YouTube](https://www.youtube.com/watch?v=SSi2TnyD6Is))
+
+---
+
+## 🚀 **UPDATED FOR PYTORCH 2.x & CUDA 12.x**
+
+This repository has been modernized to support:
+- ✅ **PyTorch 2.0+** (from 1.4.0)
+- ✅ **CUDA 12.x** (from 10.x)
+- ✅ **No apex required** - using native PyTorch features
+- ✅ **Backward compatible** - old checkpoints still work
+- ✅ **Better documented** - see new documentation files
+
+**📚 New Documentation:**
+- [`MODEL_ARCHITECTURE.md`](MODEL_ARCHITECTURE.md) - Detailed model documentation with clear input/output specs
+- [`MIGRATION_GUIDE.md`](MIGRATION_GUIDE.md) - Guide for migrating from PyTorch 1.4 to 2.x
+- [`PYTORCH2_UPDATE.md`](PYTORCH2_UPDATE.md) - Summary of all changes
+- [`example_usage.py`](ffb6d/example_usage.py) - Usage examples and model interface
+
+**🔑 Key Changes:**
+- Removed apex dependency (uses `torch.cuda.amp` instead)
+- Updated all dependencies for PyTorch 2.x compatibility
+- Added model wrapper with clear input specifications
+- Maintained full backward compatibility with pretrained models
+
+**➡️ See [`PYTORCH2_UPDATE.md`](PYTORCH2_UPDATE.md) for complete details**
+
+---
 
 ## Table of Content
 
