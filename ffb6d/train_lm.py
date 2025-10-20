@@ -102,7 +102,7 @@ parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
 parser.add_argument('--opt_level', default="O0", type=str,
-                    help='opt level of apex mix presision trainig.')
+                    help='[DEPRECATED] This parameter is no longer used (was for apex). Use native PyTorch 2.x amp instead.')
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
