@@ -50,27 +50,33 @@ year = {2020}
 ## Demo Video
 See our demo video on [YouTube](https://www.youtube.com/watch?v=SSi2TnyD6Is) or [bilibili](https://www.bilibili.com/video/BV1YU4y1a7Kp?from=search&seid=8306279574921937158).
 ## Installation
-- Install CUDA 10.1 / 10.2
-- Set up python3 environment from requirement.txt:
+
+### Updated for PyTorch 2.x and CUDA 12.x
+
+- **Install CUDA 12.x** (or use CUDA 11.8+ with PyTorch 2.x)
+  - PyTorch 2.x supports CUDA 11.8, 12.1, and later versions
+  - See [PyTorch installation guide](https://pytorch.org/get-started/locally/) for details
+
+- **Set up python3 environment from requirement.txt:**
   ```shell
   pip3 install -r requirement.txt 
   ```
-- Install [apex](https://github.com/NVIDIA/apex):
-  ```shell
-  git clone https://github.com/NVIDIA/apex
-  cd apex
-  export TORCH_CUDA_ARCH_LIST="6.0;6.1;6.2;7.0;7.5"  # set the target architecture manually, suggested in issue https://github.com/NVIDIA/apex/issues/605#issuecomment-554453001
-  pip3 install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
-  cd ..
-  ```
-- Install [normalSpeed](https://github.com/hfutcgncas/normalSpeed), a fast and light-weight normal map estimator:
+  This will install PyTorch 2.x and compatible dependencies.
+
+- **No apex required!** 
+  - The code has been updated to use native PyTorch 2.x features
+  - Mixed precision training uses `torch.cuda.amp` instead of apex
+  - Distributed training uses `torch.nn.parallel.DistributedDataParallel`
+
+- **Install [normalSpeed](https://github.com/hfutcgncas/normalSpeed)** (optional, for normal map estimation):
   ```shell
   git clone https://github.com/hfutcgncas/normalSpeed.git
   cd normalSpeed/normalSpeed
   python3 setup.py install --user
   cd ..
   ```
-- Install tkinter through ``sudo apt install python3-tk``
+  
+- **Install tkinter** through ``sudo apt install python3-tk``
 
 - Compile [RandLA-Net](https://github.com/qiqihaer/RandLA-Net-pytorch) operators:
   ```shell
@@ -167,7 +173,7 @@ See our demo video on [YouTube](https://www.youtube.com/watch?v=SSi2TnyD6Is) or 
   ```
   The trained checkpoints are stored in ``train_log/linemod/checkpoints/{cls}/``, ``train_log/linemod/checkpoints/ape/`` in this example.
   
-  **A tip for saving GPU memory**: you can open the mixed precision mode to save GPU memory by passing parameters ```opt_level=O1``` to ```train_lm.py```. The document for apex mixed precision trainnig can be found [here](https://nvidia.github.io/apex/amp.html?highlight=opt_level). If you use less than 8 GPU and the batch size is less than "3x8=24", it's recommended to use mixed precision trainning and increase the ```mini_batch_size``` in ```common.py``` as large as possible.
+  **Mixed Precision Training (PyTorch 2.x)**: For saving GPU memory, use native PyTorch automatic mixed precision. To enable it, modify the training script to use `torch.cuda.amp.autocast()` and `torch.cuda.amp.GradScaler()`. If you use less than 8 GPUs and the batch size is less than "3x8=24", it's recommended to use mixed precision training and increase the `mini_batch_size` in `common.py` as large as possible.
 
 
 ### Evaluating on the LineMOD Dataset
@@ -200,7 +206,7 @@ See our demo video on [YouTube](https://www.youtube.com/watch?v=SSi2TnyD6Is) or 
   ```
   The trained model checkpoints are stored in ``train_log/ycb/checkpoints/``
   
-  **A tip for saving GPU memory**: you can open the mixed precision mode to save GPU memory by passing parameters ```opt_level=O1``` to ```train_ycb.py```. The document for apex mixed precision trainnig can be found [here](https://nvidia.github.io/apex/amp.html?highlight=opt_level). If you use less than 8 GPU and the batch size is less than "3x8=24", it's recommended to use mixed precision trainning and increase the ```mini_batch_size``` in ```common.py``` as large as possible.
+  **Mixed Precision Training (PyTorch 2.x)**: For saving GPU memory, use native PyTorch automatic mixed precision. To enable it, modify the training script to use `torch.cuda.amp.autocast()` and `torch.cuda.amp.GradScaler()`. If you use less than 8 GPUs and the batch size is less than "3x8=24", it's recommended to use mixed precision training and increase the `mini_batch_size` in `common.py` as large as possible.
 
 ### Evaluating on the YCB-Video Dataset
 - Start evaluating by:

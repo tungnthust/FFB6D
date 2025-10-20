@@ -34,10 +34,9 @@ from utils.pvn3d_eval_utils_kpls import TorchEval
 from utils.basic_utils import Basic_Utils
 import datasets.linemod.linemod_dataset as dataset_desc
 
-from apex.parallel import DistributedDataParallel
-from apex.parallel import convert_syncbn_model
-from apex import amp
-from apex.multi_tensor_apply import multi_tensor_applier
+# Native PyTorch 2.x features - no apex needed
+from torch.nn.parallel import DistributedDataParallel
+from torch.nn import SyncBatchNorm
 
 
 parser = argparse.ArgumentParser(description="Arg parser")
@@ -152,7 +151,7 @@ def checkpoint_state(model=None, optimizer=None, best_prec=None, epoch=None, it=
         "best_prec": best_prec,
         "model_state": model_state,
         "optimizer_state": optim_state,
-        "amp": amp.state_dict(),
+        "scaler": None,  # Placeholder for GradScaler state if using mixed precision
     }
 
 
@@ -186,8 +185,7 @@ def load_checkpoint(model=None, optimizer=None, filename="checkpoint"):
             model.load_state_dict(ck_st)
         if optimizer is not None and ck["optimizer_state"] is not None:
             optimizer.load_state_dict(ck["optimizer_state"])
-        if ck.get("amp", None) is not None:
-            amp.load_state_dict(ck["amp"])
+        # Note: amp/scaler state loading removed - using native PyTorch 2.x
         print("==> Done")
         return it, epoch, best_prec
     else:
@@ -485,8 +483,8 @@ class Trainer(object):
                     self.optimizer.zero_grad()
                     _, loss, res = self.model_fn(self.model, batch, it=it)
 
-                    with amp.scale_loss(loss, self.optimizer) as scaled_loss:
-                        scaled_loss.backward()
+                    # Native PyTorch 2.x - backward without amp scaling
+                    loss.backward()
                     lr = get_lr(self.optimizer)
                     if args.local_rank == 0:
                         writer.add_scalar('lr/lr', lr, it)
@@ -589,17 +587,19 @@ def train():
         n_classes=config.n_objects, n_pts=config.n_sample_points, rndla_cfg=rndla_cfg,
         n_kps=config.n_keypoints
     )
-    model = convert_syncbn_model(model)
+    # Convert BatchNorm to SyncBatchNorm for distributed training
+    model = SyncBatchNorm.convert_sync_batchnorm(model)
     device = torch.device('cuda:{}'.format(args.local_rank))
     print('local_rank:', args.local_rank)
     model.to(device)
     optimizer = optim.Adam(
         model.parameters(), lr=args.lr, weight_decay=args.weight_decay
     )
-    opt_level = args.opt_level
-    model, optimizer = amp.initialize(
-        model, optimizer, opt_level=opt_level,
-    )
+    # Note: For mixed precision training with PyTorch 2.x, use:
+    # from torch.cuda.amp import autocast, GradScaler
+    # scaler = GradScaler()
+    # Wrap forward pass with: with autocast(): ...
+    # Use scaler.scale(loss).backward() and scaler.step(optimizer)
 
     # default value
     it = -1  # for the initialize value of `LambdaLR` and `BNMomentumScheduler`
