@@ -8,7 +8,6 @@ from __future__ import (
 import os
 import torch
 import torch.nn as nn
-from torch.autograd.function import InplaceFunction
 from itertools import repeat
 import numpy as np
 import shutil
